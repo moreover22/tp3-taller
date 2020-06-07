@@ -13,6 +13,4 @@ public:
     bool is_numeric(const std::string& input) const;
     bool validate_range(const std::string& input, int min, int max) const;
 };
-
-
 #endif

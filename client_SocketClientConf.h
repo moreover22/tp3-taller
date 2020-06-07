@@ -1,9 +1,10 @@
-#ifndef SERVER_SOCKETSERVER_H
-#define SERVER_SOCKETSERVER_H
-#include "common_Socket.h"
-#include <netdb.h>
+#ifndef CLIENT_SOCKETCLIENTCONF_H
+#define CLIENT_SOCKETCLIENTCONF_H
 
-struct SocketServerConf: public SocketConf {
+#include "common_SocketConf.h"
+#include <sys/socket.h>
+
+struct SocketClientConf: public SocketConf {
     /**
      * @brief Se configura el socketopt para el bind.
      * @param fd file descritor asociado al socket.
@@ -12,9 +13,8 @@ struct SocketServerConf: public SocketConf {
     void engage_bind_options(int fd) override;
     bool engager(int sockfd, const struct sockaddr *addr, socklen_t addrlen) 
                                                                     override;
-
-    SocketServerConf() {
-        ai_flags = AI_PASSIVE;
+    SocketClientConf() {
+        ai_flags = AF_UNSPEC;
         ai_family = AF_INET;
         ai_socktype = SOCK_STREAM;
     }

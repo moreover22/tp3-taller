@@ -15,8 +15,7 @@ private:
     Statistics& stats;
     std::map<char, Operation*> operations;
 public:
-    ClientListener(Socket& skt, CircularQueue& c_queue, Statistics& stats): 
-                                skt(skt), c_queue(c_queue), stats(stats) {}
+    ClientListener(Socket& skt, CircularQueue& c_queue, Statistics& stats);
     void listen();
     void stop_listening();
     ~ClientListener();

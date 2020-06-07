@@ -6,9 +6,8 @@
 
 class ClientCommunication: public ISendable {
 private:
-    char last_action = 0;
-    uint16_t number;
     std::string buffer_response;
+    bool new_information = false;
     Socket& client;
 public:
     explicit ClientCommunication(Socket& socket): client(socket) {}

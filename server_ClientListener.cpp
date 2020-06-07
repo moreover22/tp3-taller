@@ -1,8 +1,10 @@
 #include "server_ClientListener.h"
-#include "common_SocketClientConf.h"
 #include "server_Operation.h"
 #include <map>
 #include <utility>
+
+ClientListener::ClientListener(Socket& skt, CircularQueue& c_queue, 
+    Statistics& stats): skt(skt), c_queue(c_queue), stats(stats) {}
 
 void ClientListener::listen() {
     OperationHelp help_operation;
@@ -13,11 +15,10 @@ void ClientListener::listen() {
         {'s', &surrender_operation},
         {'n', &check_number_operation}
     };
-    SocketClientConf socket_client_conf;
     while (true) {
-        Socket client_skt(socket_client_conf);
+        Socket client_skt;
         try {
-            client_skt = skt.accept(socket_client_conf);
+            client_skt = skt.accept();
         } catch (...) {
             break;
         }

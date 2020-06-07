@@ -1,4 +1,3 @@
-#include "common_SocketClientConf.h"
 #define _POSIX_C_SOURCE 200809L
 
 #include "common_Socket.h"
@@ -62,12 +61,11 @@ void Socket::bind_and_listen(const char *service) {
     }
 }
 
-Socket Socket::accept(SocketConf& conf) {
+Socket Socket::accept() {
     int peerskt = ::accept(file_descriptor, NULL, NULL);
     if (peerskt == -1)
         throw ConnectionError("Error: en socket accept");
-    Socket client(conf);
-    client.file_descriptor = peerskt;
+    Socket client(peerskt);
     return client;
 }
 
@@ -75,9 +73,9 @@ void Socket::resolve_addrinfo(const char *host,
                                     const char *service, addrinfo_t **result) {
     addrinfo_t hints;
     memset(&hints, 0, sizeof(addrinfo_t)); 
-    hints.ai_family = configuration.ai_family;
-    hints.ai_socktype = configuration.ai_socktype;
-    hints.ai_flags = configuration.ai_flags;
+    hints.ai_family = configuration->ai_family;
+    hints.ai_socktype = configuration->ai_socktype;
+    hints.ai_flags = configuration->ai_flags;
     int status = getaddrinfo(host, service, &hints, result);
     if (status == -1) {
         throw ConnectionError("Error en getaddrinfo: %s\n", 
@@ -85,15 +83,17 @@ void Socket::resolve_addrinfo(const char *host,
     }
 }
 
-
 int Socket::engage_host(addrinfo_t *host_info) {
     addrinfo_t *hi = host_info;
     int fd = socket(hi->ai_family, hi->ai_socktype, hi->ai_protocol);
     if (fd == SKT_ERROR) {
-        throw ConnectionError("Error socket: %s\n", strerror(errno));
+        return ERROR;
     }
-    configuration.engage_bind_options(fd);
-    configuration.engager(fd, hi->ai_addr, hi->ai_addrlen);
+    configuration->engage_bind_options(fd);
+    if (!configuration->engager(fd, hi->ai_addr, hi->ai_addrlen)) {
+        close(fd);
+        return ERROR;
+    }
     file_descriptor = fd;
     return SUCCESS;
 }
@@ -136,14 +136,13 @@ int Socket::interchange_data(char *buf, size_t length) {
     return total;
 }
 
-Socket::Socket(Socket&& other): configuration(other.configuration) {
+Socket::Socket(Socket&& other) {
     this->file_descriptor = other.file_descriptor;
     other.file_descriptor = INVALID_FD;
 }
 
 Socket& Socket::operator=(Socket&& other) {
     this->file_descriptor = other.file_descriptor;
-    this->configuration = other.configuration;
     other.file_descriptor = INVALID_FD;
     return *this;
 }

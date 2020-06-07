@@ -1,4 +1,5 @@
 #include "client_ClientComunication.h"
+#include <cstring>
 #include <netinet/in.h>
 
 #define SIZEOF_UINT16 2
@@ -14,11 +15,14 @@ int ClientCommunication::receive() {
     buffer_response.resize(len_msg);
     client.receive(&buffer_response[0], len_msg);
     buffer_response[len_msg] = 0;
+    new_information = true;
     return 0;
 }
 
 void ClientCommunication::show_response() {
+    if (!new_information) return;
     printf("%s\n", buffer_response.c_str());
+    new_information = false;
 }
 
 bool ClientCommunication::is_finished() {

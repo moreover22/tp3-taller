@@ -10,10 +10,8 @@ void SocketServerConf::engage_bind_options(int fd) {
     }
 }
 
-void SocketServerConf::engager(int sockfd, const struct sockaddr *addr, 
+bool SocketServerConf::engager(int sockfd, const struct sockaddr *addr, 
                                                         socklen_t addrlen) {
     int status = ::bind(sockfd, addr, addrlen);
-    if (status == -1) {
-        throw ConnectionError("Error: bind en server socket");
-    }
+    return status != -1;
 }

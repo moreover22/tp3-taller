@@ -15,9 +15,13 @@ Server::Server(const char* service, const char* number_path):
 
 void Server::run() {
     std::string input;
-    std::cin >> input;
-    if (input == "q") {
-        listener.stop_listening();
+    bool quit = false;
+    while (!quit) {
+        std::cin >> input;
+        if (input == "q") {
+            listener.stop_listening();
+            quit = true;
+        }
     }
 }
 

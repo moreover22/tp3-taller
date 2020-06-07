@@ -10,7 +10,7 @@ struct SocketConf {
      * @throw ConnectionError en caso de error.
      */
     virtual void engage_bind_options(int fd) = 0;
-    virtual void engager(int sockfd, const struct sockaddr *addr, 
+    virtual bool engager(int sockfd, const struct sockaddr *addr, 
                                                         socklen_t addrlen) = 0;
     int ai_flags;
     int ai_family;

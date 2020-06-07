@@ -11,6 +11,12 @@
 #define SIZEOF_UINT16 2
 #define SIZEOF_BYTE 1
 
+PeerClient::PeerClient(int number, Socket client, std::map<char, Operation*>* 
+    operations, Statistics& stats): number(number), client(std::move(client)), 
+                operations(operations), tries(0), _is_open(true), stats(stats){
+    start();
+}
+
 int PeerClient::send(const char* buffer, size_t len) {
     return client.send(buffer, len);
 }
@@ -52,6 +58,7 @@ void PeerClient::win() {
 bool PeerClient::is_open() {
     return _is_open;
 }
+
 void PeerClient::count_corrections(std::map<Correction, size_t>& 
                                 correction_count, const std::string& guess) {
     std::string number_as_string = std::to_string(number);

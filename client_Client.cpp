@@ -18,6 +18,7 @@ void Client::run() {
     do {
         std::string input;
         std::getline(std::cin, input);
+        if (input.size() == 0) continue;
         (*commands.get(input))(input, communication);
         communication.show_response();
     } while (!communication.is_finished());

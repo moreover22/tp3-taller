@@ -2,8 +2,8 @@
 #define SERVER_PEERCLIENT_H
 #include "common_IInterchangeable.h"
 #include "common_Socket.h"
-#include "common_Statistics.h"
 #include "common_Thread.h"
+#include "server_Statistics.h"
 #include <utility>
 #include <map>
 #include <string>
@@ -23,10 +23,7 @@ private:
 
 public:
     PeerClient(int number, Socket client, std::map<char, Operation*>* 
-    operations, Statistics& stats): number(number), client(std::move(client)), 
-                operations(operations), tries(0), _is_open(true), stats(stats){
-        start();
-    }
+    operations, Statistics& stats);
     int send(const char* buffer, size_t len) override;
     int receive(char* buffer, size_t len) override;
     bool verify_number(const int& number) const;

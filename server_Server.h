@@ -2,12 +2,11 @@
 #define SERVER_SERVER_H
 
 #include "common_Socket.h"
-#include "common_Statistics.h"
 #include "common_Thread.h"
+#include "server_Statistics.h"
 #include "server_CircularQueue.h"
 #include "server_SocketServerConf.h"
 #include "server_ClientListener.h"
-
 
 class Server: public Thread {
 private:

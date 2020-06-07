@@ -14,13 +14,12 @@
 "\tXXX: Número de 3 cifras a ser enviado al servidor para adivinar el número " \
 "secreto"
 
+#define INVALID_NUMBER_MSG "Número inválido. Debe ser de 3 cifras no repetidas"
 #define SIZEOF_UINT16 2
+static void send_message(PeerClient& peer_client, const char* msg);
 
 void OperationHelp::operator()(PeerClient& peer_client) {
-    uint16_t len_msg = strlen(HELP_CLIENT_MSG);
-    uint16_t len_be = htons(len_msg);
-    peer_client.send((char *) &len_be, SIZEOF_UINT16);
-    peer_client.send(HELP_CLIENT_MSG, len_msg);
+    send_message(peer_client, HELP_CLIENT_MSG);
 }
 
 void OperationSurrender::operator()(PeerClient& peer_client) {
@@ -30,9 +29,8 @@ void OperationSurrender::operator()(PeerClient& peer_client) {
 std::string correction_message(std::map<Correction, size_t>& 
                                                             correction_count) {
     if (correction_count[Correction::right] == 0 && 
-        correction_count[Correction::regular] == 0){
+            correction_count[Correction::regular] == 0)
         return std::move(std::string("3 mal"));
-    }
     if (correction_count[Correction::regular] == 0) {
         size_t right_count = correction_count[Correction::right];
         std::string right_count_s = std::to_string(right_count);
@@ -53,12 +51,24 @@ std::string correction_message(std::map<Correction, size_t>&
     return std::move(correction_s.str());
 }
 
+static void send_message(PeerClient& peer_client, const char* msg) {
+    uint16_t len_msg = strlen(msg);
+    uint16_t len_be = htons(len_msg);
+    peer_client.send((char *) &len_be, SIZEOF_UINT16);
+    peer_client.send(msg, len_msg);
+}
+
 void OperationCheckNumber::operator()(PeerClient& peer_client) {
     uint16_t guess_number;
     peer_client.receive((char *) &guess_number, SIZEOF_UINT16);
     guess_number = ntohs(guess_number);
     std::string guess_s = std::to_string(guess_number);;
 
+    if (!validator.validate(guess_s)) {
+        send_message(peer_client ,INVALID_NUMBER_MSG);
+        peer_client.count_try();
+        return;
+    }
     std::map<Correction, size_t> correction_count{
         { Correction::regular, 0 },
         { Correction::right, 0 },
@@ -72,9 +82,6 @@ void OperationCheckNumber::operator()(PeerClient& peer_client) {
     } else if (!peer_client.validate_tries()) {
         peer_client.lose();
     } else {
-        uint16_t len_msg = correction.length();
-        uint16_t len_be = htons(len_msg);
-        peer_client.send((char *) &len_be, SIZEOF_UINT16);
-        peer_client.send(correction.c_str(), len_msg);
+        send_message(peer_client, correction.c_str());
     }
 }

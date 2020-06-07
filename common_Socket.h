@@ -14,7 +14,7 @@ typedef struct addrinfo addrinfo_t;
 
 class Socket: public IInterchangeable {
 protected:
-    SocketConf& configuration;
+    SocketConf* configuration;
     int file_descriptor;
 
 private:
@@ -61,9 +61,12 @@ public:
     /**
      * @brief Constructor socket
      */
-    explicit Socket(SocketConf& conf): configuration(conf), 
+    explicit Socket(SocketConf& conf): configuration(&conf), 
                                                 file_descriptor(INVALID_FD) {}
 
+    explicit Socket(int file_descriptor): file_descriptor(file_descriptor) {}
+    Socket(): file_descriptor(INVALID_FD) {}
+    
     /**
      * @brief Destructor socket
      */
@@ -101,7 +104,7 @@ public:
      * @throw ConnectionError en caso de error.
      * Lado del server
      */
-    Socket accept(SocketConf& conf);
+    Socket accept();
 
 
     /**

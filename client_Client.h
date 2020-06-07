@@ -3,7 +3,7 @@
 #include "client_ClientComunication.h"
 #include "client_InputCommand.h"
 #include "common_Socket.h"
-#include "common_SocketClientConf.h"
+#include "client_SocketClientConf.h"
 #include "common_NumberValidator.h"
 
 class Client {
